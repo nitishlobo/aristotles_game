@@ -1,6 +1,23 @@
 import pygame
 import colours
 
+class Cell(object):
+    '''A rectangular cell with text properties.
+    Keyword arguments:
+
+    '''
+    def __init__(self, surf, left, top, width, height, word, cell_colour, cell_border=0):
+        self.surf = surf
+        self.left = left
+        self.top = top
+        self.width = width
+        self.height = height
+        self.cell_colour = cell_colour
+        self.cell_border = cell_border
+
+    def draw_rect(self):
+        pygame.draw.rect(self.surf, self.colour, (self.left, self.top, self.width, self.height), self.border)
+
 def game_loop(game_display):
     exit_game = False
     while exit_game is False:
