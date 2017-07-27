@@ -2,9 +2,17 @@ import pygame
 import colours
 
 class Cell(object):
-    '''A rectangular cell with text properties.
-    Keyword arguments:
+    '''Rectangular cell with the game word and game properties.
 
+    Keyword arguments:
+    surf -- display surface of pygame.
+    left -- pixel from the left of the screen for the left edge of the rectangular cell.
+    top -- pixel from the top of the screen for the top edge of the rectangular cell.
+    width -- width of the rectanglular cell.
+    height -- height of the rectanglular cell.
+    word -- game word of the cell.
+    cell_colour -- initial cell colour.
+    cell_border -- border of the cell.
     '''
     def __init__(self, surf, left, top, width, height, word, cell_colour, cell_border=0):
         self.surf = surf
@@ -16,6 +24,7 @@ class Cell(object):
         self.cell_border = cell_border
 
     def draw_rect(self):
+        '''Draw a shaded rectangle.'''
         pygame.draw.rect(self.surf, self.colour, (self.left, self.top, self.width, self.height), self.border)
 
 def game_loop(game_display):
@@ -23,7 +32,7 @@ def game_loop(game_display):
     while exit_game is False:
         for event in pygame.event.get():
             #Exit pygame display and python script
-            if event.type == pygame.QUIT:
+            if event.type == pygame.QUIT or ((event.type == pygame.KEYDOWN) and (event.key == pygame.K_ESCAPE)):
                 pygame.quit()
                 quit()
 
