@@ -1,5 +1,5 @@
 import pygame
-import spacy
+import linecache
 import colours
 
 class Cell(object):
@@ -46,6 +46,24 @@ class Cell(object):
         pygame.display.update()
         return
 
+def file_len(fname):
+    '''Return the number of lines a specified file has.
+    Otherwise return -1 if specified file does not exist.
+    '''
+    #For empty files
+    i = -1
+    #Verify file exists
+    try:
+        f = open(fname, 'rb')
+    except IOError:
+        return -1
+
+    #Open file and read the lines
+    with f:
+        for i, line in enumerate(f):
+            pass
+    return i + 1
+
 def game_loop(game_display):
     exit_game = False
     while exit_game is False:
@@ -60,38 +78,43 @@ def game_loop(game_display):
     return
 
 #Main code begins
-nlp = spacy.load('en')
-doc = nlp(u'This is a sentence')
-print(doc)
-pygame.init()
+if __name__ == '__main__':
+    pygame.init()
 
-#Launch game window
-window_w = 700
-window_h = 400
-game_display = pygame.display.set_mode((window_w, window_h), pygame.RESIZABLE)
-game_display.fill(colours.WHITE)
+    #Launch game window
+    window_w = 700
+    window_h = 400
+    game_display = pygame.display.set_mode((window_w, window_h), pygame.RESIZABLE)
+    game_display.fill(colours.WHITE)
 
-#Grid properties
-rows = 5
-cols = 5
-cell_w = window_w/(cols+3)
-cell_h = window_h/(rows+3)
+    #Grid properties
+    rows = 5
+    cols = 5
+    cell_w = window_w/(cols+3)
+    cell_h = window_h/(rows+3)
 
-#Determine grid 'white' space border size
-margin_w = cell_w/2
-margin_h = cell_h/2
+    #Determine grid 'white' space border size
+    margin_w = cell_w/2
+    margin_h = cell_h/2
 
-#Determine gap sizes between cells in the grid
-gap_w = (cell_w*2)/(cols-1)
-gap_h = (cell_h*2)/(rows-1)
+    #Determine gap sizes between cells in the grid
+    gap_w = (cell_w*2)/(cols-1)
+    gap_h = (cell_h*2)/(rows-1)
 
-word = 'hello'
-cell_list = []
-for i in range(0, rows):
-    for j in range(0, cols):
-        cell_list.append(Cell(game_display, margin_w + cell_w*j + gap_w*j, margin_h + cell_h*i + gap_h*i, cell_w, cell_h, colours.PRIMARY_RED, word))
-        cell_list[-1].draw_rect()
-        cell_list[-1].display_word()
+    print("dictionary.csv file has", file_len("dictionary.csv"), "lines")
+    print("empty.csv file has", file_len("empty.csv"), "lines")
+    print("yellow.csv file has", file_len("yellow.csv"), "lines")
 
-#Run the game
-game_loop(game_display)
+    line = linecache.getline("dictionary.csv", 20278)
+    print(line)
+
+    word = 'hello'
+    cell_list = []
+    for i in range(0, rows):
+        for j in range(0, cols):
+            cell_list.append(Cell(game_display, margin_w + cell_w*j + gap_w*j, margin_h + cell_h*i + gap_h*i, cell_w, cell_h, colours.PRIMARY_RED, word))
+            cell_list[-1].draw_rect()
+            cell_list[-1].display_word()
+
+    #Run the game
+    game_loop(game_display)
