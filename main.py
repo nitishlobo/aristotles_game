@@ -1,3 +1,4 @@
+import random
 import pygame
 import linecache
 import colours
@@ -148,18 +149,17 @@ if __name__ == '__main__':
     gap_w = (cell_w*2)/(cols-1)
     gap_h = (cell_h*2)/(rows-1)
 
-    print("dictionary.csv file has", file_len(DICTIONARY_FILE), "lines")
-    print("empty.csv file has", file_len("empty.csv"), "lines")
-    print("yellow.csv file has", file_len("yellow.csv"), "lines")
+    #Use system clock to generate random numbers
+    random.seed(None)
 
-    #Get a word from the dictionary and clear the cache afterwords
-    line = linecache.getline(DICTIONARY_FILE, 20278)
-    linecache.clearcache()
-
-    word = 'hello'
     cell_list = []
     for i in range(0, rows):
         for j in range(0, cols):
+            #Get a word from the dictionary and clear the cache afterwords
+            word = linecache.getline(DICTIONARY_FILE, random.randint(1, word_count)).strip('\n\r\t')
+            linecache.clearcache()
+
+            #Generate a cell and display the game words
             cell_list.append(Cell(game_display, margin_w + cell_w*j + gap_w*j, margin_h + cell_h*i + gap_h*i, cell_w, cell_h, colours.PRIMARY_RED, word))
             cell_list[-1].draw_rect()
             cell_list[-1].display_word()
