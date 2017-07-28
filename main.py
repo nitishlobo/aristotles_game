@@ -1,4 +1,5 @@
 import pygame
+import spacy
 import colours
 
 class Cell(object):
@@ -8,24 +9,42 @@ class Cell(object):
     surf -- display surface of pygame.
     left -- pixel from the left of the screen for the left edge of the rectangular cell.
     top -- pixel from the top of the screen for the top edge of the rectangular cell.
-    width -- width of the rectanglular cell.
-    height -- height of the rectanglular cell.
-    word -- game word of the cell.
-    cell_colour -- initial cell colour.
-    cell_border -- border of the cell.
+    width -- width of the rectanglular cell
+    height -- height of the rectanglular cell
+    cell_colour -- initial cell colour
+    word -- game word of the cell
+    font_size = font size of the game word (default 24)
+    cell_border -- border of the cell (default 0)
     '''
-    def __init__(self, surf, left, top, width, height, word, cell_colour, cell_border=0):
+    def __init__(self, surf, left, top, width, height, cell_colour, word, font_size=24, cell_border=0):
         self.surf = surf
         self.left = left
         self.top = top
         self.width = width
         self.height = height
         self.cell_colour = cell_colour
+        self.word = word
+        self.font_size = font_size
         self.cell_border = cell_border
 
     def draw_rect(self):
         '''Draw a shaded rectangle.'''
-        pygame.draw.rect(self.surf, self.colour, (self.left, self.top, self.width, self.height), self.border)
+        pygame.draw.rect(self.surf, self.cell_colour, (self.left, self.top, self.width, self.height), self.cell_border)
+        return
+
+    def display_word(self):
+        '''Display the game word.'''
+        #Use default pygame font type
+        font = pygame.font.Font(None, self.font_size)
+        #Get an invisible rectangular surface for the word and configure its location.
+        text_surf = font.render(self.word, True, colours.WHITE)
+        text_rect = text_surf.get_rect()
+        text_rect.center = (self.left + (self.width/2), self.top + (self.height/2))
+
+        #Overlay current word onto the game display surface and display it.
+        self.surf.blit(text_surf, text_rect)
+        pygame.display.update()
+        return
 
 def game_loop(game_display):
     exit_game = False
@@ -41,6 +60,9 @@ def game_loop(game_display):
     return
 
 #Main code begins
+nlp = spacy.load('en')
+doc = nlp(u'This is a sentence')
+print(doc)
 pygame.init()
 
 #Launch game window
@@ -63,10 +85,13 @@ margin_h = cell_h/2
 gap_w = (cell_w*2)/(cols-1)
 gap_h = (cell_h*2)/(rows-1)
 
-#Generate a grid of rectangles
+word = 'hello'
+cell_list = []
 for i in range(0, rows):
     for j in range(0, cols):
-        pygame.draw.rect(game_display, colours.PRIMARY_RED, (margin_w + cell_w*j + gap_w*j, margin_h + cell_h*i + gap_h*i, cell_w, cell_h), 0)
+        cell_list.append(Cell(game_display, margin_w + cell_w*j + gap_w*j, margin_h + cell_h*i + gap_h*i, cell_w, cell_h, colours.PRIMARY_RED, word))
+        cell_list[-1].draw_rect()
+        cell_list[-1].display_word()
 
 #Run the game
 game_loop(game_display)
