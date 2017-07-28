@@ -121,12 +121,12 @@ if __name__ == '__main__':
 
     #Display error if the dictionary file is missing or if there are not enough words.
     word_count = file_len(DICTIONARY_FILE)
-    error_msg = "Error: Too few words in the dictionary file to play the game!"
+    error_msg = "Error: Insufficient dictionary words to play the game!"
     if word_count < 20:
         if word_count == -1:
             error_msg = "Error: could not find the dictionary file!"
         text_surf, text_rect = get_text_surf_and_pos(game_display, error_msg, colours.PRIMARY_RED, \
-                                                    45, window_w/2, window_h/2)
+                                                    35, window_w/2, window_h/2)
 
         #Overlay current message onto the game display surface and display it.
         game_display.blit(text_surf, text_rect)
@@ -152,8 +152,9 @@ if __name__ == '__main__':
     print("empty.csv file has", file_len("empty.csv"), "lines")
     print("yellow.csv file has", file_len("yellow.csv"), "lines")
 
+    #Get a word from the dictionary and clear the cache afterwords
     line = linecache.getline(DICTIONARY_FILE, 20278)
-    print(line)
+    linecache.clearcache()
 
     word = 'hello'
     cell_list = []
