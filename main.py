@@ -1,4 +1,9 @@
-import random
+#TODO: CTRL+FIND ALL THE TODO'S AND DO THEM
+#TODO: ADD A FILE DESCRIPTIONS
+#TODO: BREAK THIS FILE INTO MULTIPLE FILES IN MULTIPLE DIRECTORIES. \
+#   ONE OF THE DIRECTORIES WOULD BE COMMON PYGAME FUNCTIONS.
+
+from random import seed, randint
 import pygame
 import linecache
 import colours
@@ -17,10 +22,11 @@ class Cell(object):
     height -- height of the rectanglular cell
     cell_colour -- initial cell colour
     word -- game word of the cell
+    team -- which team the word belongs too. 0 for netural, -1 death word, 1 for team 1 and 2 for team 2.
     font_size = font size of the game word (default 24)
     cell_border -- border of the cell (default 0)
     '''
-    def __init__(self, surf, left, top, width, height, cell_colour, word, font_size=24, cell_border=0):
+    def __init__(self, surf, left, top, width, height, cell_colour, word, team, font_size=24, cell_border=0):
         self.surf = surf
         self.left = left
         self.top = top
@@ -28,6 +34,7 @@ class Cell(object):
         self.height = height
         self.cell_colour = cell_colour
         self.word = word
+        self.team = team
         self.font_size = font_size
         self.cell_border = cell_border
 
@@ -65,6 +72,7 @@ def file_len(fname):
             pass
     return i + 1
 
+#TODO: BUGFIX - PROVIDE OPTION TO RESIZE THE TEXT TO FIT WITHIN A SPECIFIED RECTANGULAR WIDTH & HEIGHT
 def get_text_surf_and_pos(surf, string, colour, font_size, x, y, font=None):
     '''Return a surface object, its location, width and
     height on which text/string can be displayed on.
@@ -121,10 +129,10 @@ if __name__ == '__main__':
     game_display.fill(colours.WHITE)
 
     #Display error if the dictionary file is missing or if there are not enough words.
-    word_count = file_len(DICTIONARY_FILE)
+    dict_count = file_len(DICTIONARY_FILE)
     error_msg = "Error: Insufficient dictionary words to play the game!"
-    if word_count < 20:
-        if word_count == -1:
+    if dict_count < 20:
+        if dict_count == -1:
             error_msg = "Error: could not find the dictionary file!"
         text_surf, text_rect = get_text_surf_and_pos(game_display, error_msg, colours.PRIMARY_RED, \
                                                     35, window_w/2, window_h/2)
@@ -150,13 +158,18 @@ if __name__ == '__main__':
     gap_h = (cell_h*2)/(rows-1)
 
     #Use system clock to generate random numbers
-    random.seed(None)
+    seed(None)
+    #Randomly assign words to 1 of 2 teams, then pick 1 death word and some neutral words
+    teams = [randint(1, 2) for i in xrange(rows*cols)]
+    teams[randint(0, rows*cols)] = -1
+    #TODO: DETERMINE HOW MANY NEUTRAL WORDS ARE NEEDED
+    neutral_amount = rows*cols - 1
 
     cell_list = []
     for i in range(0, rows):
         for j in range(0, cols):
             #Get a word from the dictionary and clear the cache afterwords
-            word = linecache.getline(DICTIONARY_FILE, random.randint(1, word_count)).strip('\n\r\t')
+            word = linecache.getline(DICTIONARY_FILE, randint(1, dict_count)).strip('\n\r\t')
             linecache.clearcache()
 
             #Generate a cell and display the game words
