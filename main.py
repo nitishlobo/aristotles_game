@@ -4,8 +4,8 @@
 #   ONE OF THE DIRECTORIES WOULD BE COMMON PYGAME FUNCTIONS.
 
 from random import seed, randint
-import pygame
 import linecache
+import pygame
 import colours
 
 #English words dictionary.
@@ -22,7 +22,7 @@ class Cell(object):
     height -- height of the rectanglular cell
     cell_colour -- initial cell colour
     word -- game word of the cell
-    team -- which team the word belongs too. 0 for netural, -1 death word, 1 for team 1 and 2 for team 2.
+    team -- which team the word belongs too. 0 - netural, -1 - death word, 1 - team A, 2 - team B.
     font_size = font size of the game word (default 24)
     cell_border -- border of the cell (default 0)
     '''
@@ -40,17 +40,18 @@ class Cell(object):
 
     def draw_rect(self):
         '''Draw a shaded rectangle.'''
-        pygame.draw.rect(self.surf, self.cell_colour, (self.left, self.top, self.width, self.height), self.cell_border)
+        pygame.draw.rect(self.surf, self.cell_colour, \
+                        (self.left, self.top, self.width, self.height), self.cell_border)
         return
 
     def display_word(self):
         '''Display the game word.'''
         #Get an invisible rectangular surface for the word and configure its location.
-        text_surf, text_rect = get_text_surf_and_pos(self.surf, self.word, colours.WHITE, \
-                                                    self.font_size, self.left + (self.width/2), self.top + (self.height/2))
+        tsurf, trect = get_text_surf_and_pos(str(self.word), colours.WHITE, self.font_size, \
+                            self.left + (self.width/2), self.top + (self.height/2))
 
         #Overlay current word onto the game display surface and display it.
-        self.surf.blit(text_surf, text_rect)
+        self.surf.blit(tsurf, trect)
         pygame.display.update()
         return
 
@@ -59,7 +60,7 @@ def file_len(fname):
     Otherwise return -1 if specified file does not exist.
     '''
     #For empty files
-    i = -1
+    line_count = -1
     #Verify file exists
     try:
         f = open(fname, 'rb')
@@ -68,18 +69,18 @@ def file_len(fname):
 
     #Open file and read the lines
     with f:
-        for i, line in enumerate(f):
+        for line_count, line in enumerate(f):
             pass
-    return i + 1
+    return line_count + 1
 
-#TODO: BUGFIX - PROVIDE OPTION TO RESIZE THE TEXT TO FIT WITHIN A SPECIFIED RECTANGULAR WIDTH & HEIGHT
-def get_text_surf_and_pos(surf, string, colour, font_size, x, y, font=None):
+#TODO: BUGFIX - PROVIDE OPTION TO RESIZE THE TEXT TO FIT WITHIN A
+#   SPECIFIED RECTANGULAR WIDTH & HEIGHT
+def get_text_surf_and_pos(string, colour, font_size, x, y, font=None):
     '''Return a surface object, its location, width and
     height on which text/string can be displayed on.
 
     Keyword arguments:
-    surf -- surface to display the string on.
-    string -- string to display onto screen.
+    string -- bytes type string to display onto screen.
     colour -- colour of the string.
     font_size -- font size of the string.
     x -- pixel from the left of the screen on which the middle of the string will be.
@@ -104,7 +105,7 @@ def poll_for_exit():
                 quit()
     return
 
-def game_loop(game_display):
+def game_loop():
     '''Main game loop.'''
     exit_game = False
     while exit_game is False:
@@ -134,11 +135,11 @@ if __name__ == '__main__':
     if dict_count < 20:
         if dict_count == -1:
             error_msg = "Error: could not find the dictionary file!"
-        text_surf, text_rect = get_text_surf_and_pos(game_display, error_msg, colours.PRIMARY_RED, \
+        esurf, erect = get_text_surf_and_pos(game_display, error_msg, colours.PRIMARY_RED, \
                                                     35, window_w/2, window_h/2)
 
         #Overlay current message onto the game display surface and display it.
-        game_display.blit(text_surf, text_rect)
+        game_display.blit(esurf, erect)
         pygame.display.update()
         #Wait for user to exit pygame
         poll_for_exit()
@@ -160,22 +161,23 @@ if __name__ == '__main__':
     #Use system clock to generate random numbers
     seed(None)
     #Randomly assign words to 1 of 2 teams, then pick 1 death word and some neutral words
-    teams = [randint(1, 2) for i in xrange(rows*cols)]
-    teams[randint(0, rows*cols)] = -1
+    teams = [randint(1, 2) for i in range(rows*cols)]
+    teams[randint(0, rows*cols-1)] = -1
     #TODO: DETERMINE HOW MANY NEUTRAL WORDS ARE NEEDED
     neutral_amount = rows*cols - 1
 
     cell_list = []
-    for i in range(0, rows):
-        for j in range(0, cols):
+    for i in range(rows):
+        for j in range(cols):
             #Get a word from the dictionary and clear the cache afterwords
-            word = linecache.getline(DICTIONARY_FILE, randint(1, dict_count)).strip('\n\r\t')
+            w = linecache.getline(DICTIONARY_FILE, randint(1, dict_count)).strip('\n\r\t')
             linecache.clearcache()
 
             #Generate a cell and display the game words
-            cell_list.append(Cell(game_display, margin_w + cell_w*j + gap_w*j, margin_h + cell_h*i + gap_h*i, cell_w, cell_h, colours.PRIMARY_RED, word))
+            cell_list.append(Cell(game_display, margin_w + cell_w*j + gap_w*j, \
+                margin_h + cell_h*i + gap_h*i, cell_w, cell_h, colours.PRIMARY_RED, w, teams[0]))
             cell_list[-1].draw_rect()
             cell_list[-1].display_word()
 
     #Run the game
-    game_loop(game_display)
+    game_loop()
