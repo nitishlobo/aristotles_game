@@ -10,3 +10,5 @@ WHITE = (255, 255, 255)
 #Other colours
 NAVY_BLUE = (53, 115, 255)
 ORANGE = (255, 165, 0)
+SILVER = (192, 192, 192)
+ROYAL_PURPLE = (102, 0, 102)
