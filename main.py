@@ -1,5 +1,5 @@
 #TODO: CTRL+FIND ALL THE TODO'S AND DO THEM
-#TODO: ADD A FILE DESCRIPTIONS
+#TODO: ADD A FILE DESCRIPTION
 #TODO: BREAK THIS FILE INTO MULTIPLE FILES IN MULTIPLE DIRECTORIES. \
 #   ONE OF THE DIRECTORIES WOULD BE COMMON PYGAME FUNCTIONS.
 
@@ -49,8 +49,9 @@ class Cell(object):
     def display_word(self):
         '''Display the game word.'''
         #Get an invisible rectangular surface for the word and configure its location.
-        tsurf, trect = get_text_surf_and_pos(str(self.word), colours.WHITE, self.font_size, \
-                            self.left + (self.width/2), self.top + (self.height/2), frame=(self.width, self.height))
+        tsurf, trect = get_text_surf_and_pos(str(self.word), colours.WHITE, \
+                                            self.font_size, self.left + (self.width/2), \
+                                            self.top + (self.height/2), frame=(self.width, self.height))
 
         #Overlay current word onto the game display surface and display it.
         self.surf.blit(tsurf, trect)
@@ -122,7 +123,7 @@ def get_text_surf_and_pos(string, colour, font_size, x, y, font=None, frame=(0, 
     if frame[0] > 0 or frame[1] > 0:
         while (f.size(string)[0] > frame[0] and frame[0] != 0) \
         or (f.size(string)[1] > frame[1] and frame[1] != 0):
-            font_size = font_size - 1
+            font_size -= 1
             f = pygame.font.Font(font, font_size)
 
     #Get an invisible rectangular surface for the word and configure its location.
@@ -246,9 +247,10 @@ if __name__ == '__main__':
 
             #Generate a cell and display the game words
             cell_list.append(Cell(game_display, margin_w + cell_w*j + gap_w*j, \
-                margin_h + cell_h*i + gap_h*i, cell_w, cell_h, \
-                colours.ROYAL_PURPLE, w, \
-                teams[i*cols + j], get_team_colour(teams[i*cols + j])))
+                                margin_h + cell_h*i + gap_h*i, cell_w, \
+                                cell_h, colours.ROYAL_PURPLE, \
+                                w, teams[i*cols + j], \
+                                get_team_colour(teams[i*cols + j])))
             cell_list[-1].draw_rect()
             cell_list[-1].display_word()
 
