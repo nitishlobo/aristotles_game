@@ -146,8 +146,12 @@ def poll_for_exit():
                 quit()
     return
 
-def game_loop():
-    '''Main game loop.'''
+def game_loop(cells):
+    '''Main game loop.
+
+    Keyword arguments:
+    cells -- list of the 'cell' class for the game.
+    '''
     exit_game = False
     while exit_game is False:
         for event in pygame.event.get():
@@ -157,8 +161,12 @@ def game_loop():
                 pygame.quit()
                 quit()
 
-            # if event.type == pygame.MOUSEBUTTONDOWN:
-                #TODO: IF PLAYER CLICKS ON CELL, THEN REVEAL THE CELL'S TEAM COLOUR.
+            #Reveal the cell's team colour when player clicks on it.
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                x, y = pygame.mouse.get_pos()
+                for c in cells:
+                    if c.left < x < c.left+c.width and c.top < y <  c.top+c.height:
+                        c.reveal_team()
 
         pygame.display.update()
     return
@@ -239,4 +247,4 @@ if __name__ == '__main__':
         # cell_list[i].reveal_team()
 
     #Run the game
-    game_loop()
+    game_loop(cell_list)
