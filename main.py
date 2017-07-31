@@ -27,7 +27,7 @@ class Cell(object):
     font_size = font size of the game word (default 24)
     cell_border -- border of the cell (default 0)
     '''
-    def __init__(self, surf, left, top, width, height, init_col, word, team, team_col, font_size=24, cell_border=0):
+    def __init__(self, surf, left, top, width, height, init_col, word, team, team_col, font_size=30, cell_border=0):
         self.surf = surf
         self.left = left
         self.top = top
@@ -50,7 +50,7 @@ class Cell(object):
         '''Display the game word.'''
         #Get an invisible rectangular surface for the word and configure its location.
         tsurf, trect = get_text_surf_and_pos(str(self.word), colours.WHITE, self.font_size, \
-                            self.left + (self.width/2), self.top + (self.height/2))
+                            self.left + (self.width/2), self.top + (self.height/2), frame=(self.width, self.height))
 
         #Overlay current word onto the game display surface and display it.
         self.surf.blit(tsurf, trect)
@@ -102,9 +102,7 @@ def file_len(fname):
             pass
     return line_count + 1
 
-#TODO: BUGFIX - PROVIDE OPTION TO RESIZE THE TEXT TO FIT WITHIN A
-#   SPECIFIED RECTANGULAR WIDTH & HEIGHT
-def get_text_surf_and_pos(string, colour, font_size, x, y, font=None):
+def get_text_surf_and_pos(string, colour, font_size, x, y, font=None, frame=(0, 0)):
     '''Return a surface object, its location, width and
     height on which text/string can be displayed on.
 
@@ -115,10 +113,20 @@ def get_text_surf_and_pos(string, colour, font_size, x, y, font=None):
     x -- pixel from the left of the screen on which the middle of the string will be.
     y -- pixel from the top of the screen on which the vertical middle of the string will be.
     font -- font type of the string. None uses inbuilt default pygame font. (default None)
+    frame -- shrink text to be within the specified frame (width, height). (default (0, 0)
+             0 for width and/or height will mean that particular parameter
+             is ignored as a shrink parameter.
     '''
-    font = pygame.font.Font(font, font_size)
+    f = pygame.font.Font(font, font_size)
+    #Shrink text to be within frame if frame is defined
+    if frame[0] > 0 or frame[1] > 0:
+        while (f.size(string)[0] > frame[0] and frame[0] != 0) \
+        or (f.size(string)[1] > frame[1] and frame[1] != 0):
+            font_size = font_size - 1
+            f = pygame.font.Font(font, font_size)
+
     #Get an invisible rectangular surface for the word and configure its location.
-    text_surf = font.render(string, True, colour)
+    text_surf = f.render(string, True, colour)
     text_rect = text_surf.get_rect()
     text_rect.center = (x, y)
     return text_surf, text_rect
@@ -176,8 +184,8 @@ if __name__ == '__main__':
     pygame.init()
 
     #Launch game window
-    window_w = 700
-    window_h = 400
+    window_w = 900
+    window_h = 600
     game_display = pygame.display.set_mode((window_w, window_h), pygame.RESIZABLE)
     game_display.fill(colours.WHITE)
 
@@ -188,7 +196,7 @@ if __name__ == '__main__':
         if dict_count == -1:
             error_msg = "Error: could not find the dictionary file!"
         esurf, erect = get_text_surf_and_pos(game_display, error_msg, colours.PRIMARY_RED, \
-                                                    35, window_w/2, window_h/2)
+                                            35, window_w/2, window_h/2)
 
         #Overlay current message onto the game display surface and display it.
         game_display.blit(esurf, erect)
@@ -212,6 +220,7 @@ if __name__ == '__main__':
 
     #Use system clock to generate random numbers
     seed(None)
+    #TODO: BUGFIX - NEED TO HAVE THE SAME NUMBER OF WORDS ASSIGNED FOR BOTH TEAMS.
     #Randomly assign each word to 1 of 2 teams
     teams = [randint(1, 2) for i in range(rows*cols)]
     #Assign 2 words to death 'team' if game has more than 25 words.
@@ -242,9 +251,6 @@ if __name__ == '__main__':
                 teams[i*cols + j], get_team_colour(teams[i*cols + j])))
             cell_list[-1].draw_rect()
             cell_list[-1].display_word()
-
-    # for i in range(rows*cols):
-        # cell_list[i].reveal_team()
 
     #Run the game
     game_loop(cell_list)
