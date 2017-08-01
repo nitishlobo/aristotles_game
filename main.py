@@ -221,22 +221,26 @@ if __name__ == '__main__':
 
     #Use system clock to generate random numbers
     seed(None)
-    #TODO: BUGFIX - NEED TO HAVE THE SAME NUMBER OF WORDS ASSIGNED FOR BOTH TEAMS.
-    #Randomly assign each word to 1 of 2 teams
-    teams = [randint(1, 2) for i in range(rows*cols)]
+    #Assign all words to neutral 'team'
+    teams = [0 for i in range(rows*cols)]
+
     #Assign 2 words to death 'team' if game has more than 25 words.
     if rows*cols > 25:
         deaths = get_indexes(2, rows*cols)
     else:
         deaths = get_indexes(1, rows*cols)
 
+    #Assign 40% of total words to each team
+    team_1 = get_indexes(int((2*rows*cols)/5), rows*cols, deaths)
+    team_2 = get_indexes(int((2*rows*cols)/5), rows*cols, deaths + team_1)
+
+    #Finish team assignments
     for i in deaths:
         teams[i] = -1
-
-    #Assign words to neutral 'team'
-    neutrals = get_indexes(int(((rows*cols)/5) - len(deaths)), rows*cols, deaths)
-    for i in neutrals:
-        teams[i] = 0
+    for i in team_1:
+        teams[i] = 1
+    for i in team_2:
+        teams[i] = 2
 
     cell_list = []
     for i in range(rows):
