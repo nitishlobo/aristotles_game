@@ -84,23 +84,7 @@ def get_indexes(amount, game_size, exclude=[None]):
         indexes.append(new_index)
     return indexes
 
-def file_len(fname):
-    '''Return an int for the number of lines a specified file has.
-    Otherwise return -1 if specified file does not exist.
-    '''
-    #For empty files
-    line_count = -1
-    #Verify file exists
-    try:
-        f = open(fname, 'rb')
-    except IOError:
-        return -1
 
-    #Open file and read the lines
-    with f:
-        for line_count, line in enumerate(f):
-            pass
-    return line_count + 1
 
 def get_text_surf_and_pos(string, colour, font_size, x, y, align='center', font=None, frame=(0, 0)):
     '''Return a surface object, its location, width and
@@ -219,7 +203,6 @@ def game_loop(display, win_score, cells):
                             score_t2 += 1
                             update_score(display, score_font_size, win_score, score_t1, score_t2)
 
-
         pygame.display.update()
     return
 
@@ -303,7 +286,7 @@ if __name__ == '__main__':
                                 get_team_colour(teams[i*cols + j])))
             cell_list[-1].draw_rect()
             cell_list[-1].display_word()
-            
+
     #TODO: BREAK THIS FILE INTO MULTIPLE FILES IN MULTIPLE DIRECTORIES. \
     #   ONE OF THE DIRECTORIES WOULD BE COMMON PYGAME FUNCTIONS.
     #TODO: CREATE A CLASS CALLED GAME AND HAVE SCORE COUNTER VARIABLES, SCORE STRINGS ALL IN THERE.
