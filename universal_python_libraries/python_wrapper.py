@@ -4,7 +4,7 @@
     --
 
     Key functions:
-    file_len -- 
+    file_len -- Return (as an int) the number of lines a specified file has.
 '''
 
 def file_len(fname):

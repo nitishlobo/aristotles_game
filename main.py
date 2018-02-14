@@ -4,11 +4,14 @@
 from random import seed, randint
 import linecache
 import pygame
-import colours
+from universal_python_libraries import python_wrapper as pw
+from universal_python_libraries import pygame_wrapper as gw
+from universal_python_libraries import colours
 
 #English words dictionary.
 DICTIONARY_FILE = 'dictionary.csv'
 SCORE = ['Score to win: ', 'Team 1: ', 'Team 2: ']
+GAME_BACKGROUND_COLOUR = colours.WHITE
 
 class Cell(object):
     '''Rectangular cell with the game word and game properties.
@@ -48,7 +51,7 @@ class Cell(object):
     def display_word(self):
         '''Display the game word.'''
         #Get an invisible rectangular surface for the word and configure its location.
-        tsurf, trect = get_text_surf_and_pos(str(self.word), colours.WHITE, \
+        tsurf, trect = gw.get_text_surf_and_pos(str(self.word), colours.WHITE, \
                                             self.font_size, self.left + (self.width/2), \
                                             self.top + (self.height/2), frame=(self.width, self.height))
 
@@ -84,43 +87,6 @@ def get_indexes(amount, game_size, exclude=[None]):
         indexes.append(new_index)
     return indexes
 
-
-
-def get_text_surf_and_pos(string, colour, font_size, x, y, align='center', font=None, frame=(0, 0)):
-    '''Return a surface object, its location, width and
-    height on which text/string can be displayed on.
-
-    Keyword arguments:
-    string -- bytes type string to display onto screen.
-    colour -- colour of the string.
-    font_size -- font size of the string.
-    x -- pixel from the left of the screen on which the middle of the string will be.
-    y -- pixel from the top of the screen on which the vertical middle of the string will be.
-    align -- either 'left' or 'center' alignment of text. (default 'center')
-            Indicates whether the x argument given is left or center.
-    font -- font type of the string. None uses inbuilt default pygame font. (default None)
-    frame -- shrink text to be within the specified frame (width, height). (default (0, 0)
-             0 for width and/or height will mean that particular parameter
-             is ignored as a shrink parameter.
-    '''
-    f = pygame.font.Font(font, font_size)
-    #Shrink text to be within frame if frame is defined
-    if frame[0] > 0 or frame[1] > 0:
-        while (f.size(string)[0] > frame[0] and frame[0] != 0) \
-        or (f.size(string)[1] > frame[1] and frame[1] != 0):
-            font_size -= 1
-            f = pygame.font.Font(font, font_size)
-
-    #Get an invisible rectangular surface for the word and configure its location.
-    text_surf = f.render(string, True, colour)
-    text_rect = text_surf.get_rect()
-    if align.lower() == 'left':
-        text_rect.left = x
-        text_rect.centery = y
-    else:
-        text_rect.center = (x, y)
-    return text_surf, text_rect
-
 def update_score(display, font_size, win_score, score_t1, score_t2):
     '''Display score needed to win and also each teams score.
 
@@ -131,11 +97,23 @@ def update_score(display, font_size, win_score, score_t1, score_t2):
     score_t1 -- team 1 score
     score_t2 -- team 2 score
     '''
-    #TODO: BUGFIX - WHEN A CELL IS CLICKED, NEW SCORE IS OVERLAYED ON TOP OF THE PREVIOUS SCORE.
-    #   NEED TO BLIT THAT PART OF THE SCREEN TO A BLANK BACKGROUND FIRST.
-    win_surf, win_rect = get_text_surf_and_pos(SCORE[0]+str(win_score), colours.BLACK, font_size, 2, font_size/2, 'left')
-    sc1_surf, sc1_rect = get_text_surf_and_pos(SCORE[1]+str(score_t1), colours.BLACK, font_size, 2, int(font_size*1.25), 'left')
-    sc2_surf, sc2_rect = get_text_surf_and_pos(SCORE[2]+str(score_t2), colours.BLACK, font_size, 2, int(font_size*2), 'left')
+    #Create surface and rectangular objects from text
+    win_surf, win_rect = gw.get_text_surf_and_pos(SCORE[0]+str(win_score), colours.BLACK, font_size, 2, font_size/2, 'left')
+    sc1_surf, sc1_rect = gw.get_text_surf_and_pos(SCORE[1]+str(score_t1), colours.BLACK, font_size, 2, int(font_size*1.25), 'left')
+    sc2_surf, sc2_rect = gw.get_text_surf_and_pos(SCORE[2]+str(score_t2), colours.BLACK, font_size, 2, int(font_size*2), 'left')
+
+    #Clear current scores on the screen by drawing a blank square (ie. same colour as the background) on top of it.
+    clear_win_surf = win_surf.copy()
+    clear_sc1_surf = sc1_surf.copy()
+    clear_sc2_surf = sc2_surf.copy()
+    clear_win_surf.fill(GAME_BACKGROUND_COLOUR)
+    clear_sc1_surf.fill(GAME_BACKGROUND_COLOUR)
+    clear_sc2_surf.fill(GAME_BACKGROUND_COLOUR)
+    display.blit(clear_win_surf, win_rect)
+    display.blit(clear_sc1_surf, sc1_rect)
+    display.blit(clear_sc2_surf, sc2_rect)
+
+    #Display the scores on top of the cleared scores
     display.blit(win_surf, win_rect)
     display.blit(sc1_surf, sc1_rect)
     display.blit(sc2_surf, sc2_rect)
@@ -163,6 +141,16 @@ def poll_for_exit():
                 or ((event.type == pygame.KEYDOWN) and (event.key == pygame.K_ESCAPE)):
                 pygame.quit()
                 quit()
+    return
+
+def game_over(display):
+    game_over_text_surf, game_over_rect = gw.get_text_surf_and_pos('Game over! Death word was chosen.', colours.BLACK, font_size,
+                                                                display.get_width()/2, display.get_height()/2)
+    #TODO: FINISH THIS SECTION TO DRAW A POP-UP BOX PROVIDING THE USER TO SELECT AN 'OK' OPTION
+    game_over_box = game_over_surf.copy()
+    display.blit(game_over_surf, game_over_rect)
+    pygame.display.update()
+    poll_for_exit()
     return
 
 def game_loop(display, win_score, cells):
@@ -197,11 +185,14 @@ def game_loop(display, win_score, cells):
                         #Update score
                         #TODO: END GAME IF DEATH WORD HAS BEEN DISCOVERED.
                         #   KEEP THE WORDS FOR THE TEAM TO BE ABLE TO DISCUSS WHAT WENT DOWN.
+                        #TODO: END GAME WHEN ONE OF THE TEAM WINS (ie. team score >= score to win).
                         if c.team == 1:
                             score_t1 += 1
                         elif c.team == 2:
                             score_t2 += 1
-                            update_score(display, score_font_size, win_score, score_t1, score_t2)
+                        elif c.team == -1:
+                            game_over(display)
+                        update_score(display, score_font_size, win_score, score_t1, score_t2)
 
         pygame.display.update()
     return
@@ -214,16 +205,16 @@ if __name__ == '__main__':
     window_w = 900
     window_h = 600
     game_display = pygame.display.set_mode((window_w, window_h), pygame.RESIZABLE)
-    game_display.fill(colours.WHITE)
+    game_display.fill(GAME_BACKGROUND_COLOUR)
 
     #Display error if the dictionary file is missing or if there are not enough words.
-    dict_count = file_len(DICTIONARY_FILE)
+    dict_count = pw.file_len(DICTIONARY_FILE)
     font_size = 30
     error_msg = "Error: Insufficient dictionary words to play the game!"
     if dict_count < 20:
         if dict_count == -1:
             error_msg = "Error: could not find the dictionary file!"
-        esurf, erect = get_text_surf_and_pos(game_display, error_msg, colours.PRIMARY_RED, \
+        esurf, erect = gw.get_text_surf_and_pos(game_display, error_msg, colours.PRIMARY_RED, \
                                             35, window_w/2, window_h/2)
 
         #Overlay current message onto the game display surface and display it.
@@ -287,12 +278,12 @@ if __name__ == '__main__':
             cell_list[-1].draw_rect()
             cell_list[-1].display_word()
 
-    #TODO: BREAK THIS FILE INTO MULTIPLE FILES IN MULTIPLE DIRECTORIES. \
-    #   ONE OF THE DIRECTORIES WOULD BE COMMON PYGAME FUNCTIONS.
     #TODO: CREATE A CLASS CALLED GAME AND HAVE SCORE COUNTER VARIABLES, SCORE STRINGS ALL IN THERE.
     #   FILES TO SPLIT INTO SO THAT THIS PROGRAM IS MORE OOP:
     #       1) GENERIC PYTHON LIBRARIES (eg. colours, reading from files, etc.)
     #       2) GENERIC PYGAME RELATED FUNCTIONS & CLASSES (eg: displaying text, etc...)
     #       3) PYGAME CLASSES RELATED ONLY SPECIFICALLY TO THIS GAME
     #Run the game
+
+    #TODO: CREATE A 'NEW GAME' BUTTON WHICH RESTARTS THE GAME.
     game_loop(game_display, score_to_win, cell_list)
