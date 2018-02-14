@@ -1,6 +1,8 @@
 #TODO: CTRL+FIND ALL THE TODO'S AND DO THEM
 #TODO: ADD A FILE DESCRIPTION
 
+#TODO: CREATE A WIKI INSTRUCTION SET ON HOW TO PLAY THE GAME
+
 from random import seed, randint
 import linecache
 import pygame
@@ -283,7 +285,8 @@ if __name__ == '__main__':
     #       1) GENERIC PYTHON LIBRARIES (eg. colours, reading from files, etc.)
     #       2) GENERIC PYGAME RELATED FUNCTIONS & CLASSES (eg: displaying text, etc...)
     #       3) PYGAME CLASSES RELATED ONLY SPECIFICALLY TO THIS GAME
-    #Run the game
 
     #TODO: CREATE A 'NEW GAME' BUTTON WHICH RESTARTS THE GAME.
+
+    #Run the game
     game_loop(game_display, score_to_win, cell_list)
