@@ -69,26 +69,6 @@ class Cell(object):
         self.display_word()
         return
 
-def get_indexes(amount, game_size, exclude=[None]):
-    '''Return a list of random indexes indicating the position of words.
-    For example, if amount of neutral words needed is 4 for a game size of 30,
-    then pass a list of indexes that have already been assigned for death words
-    so that these can be excluded.
-
-    Keyword arguments:
-    amount -- number of indexes required.
-    game_size -- total number of words in the game.
-    exclude -- list of forbidden indexes.
-    '''
-    seed(None)
-    indexes = []
-    for i in range(amount):
-        new_index = randint(0, game_size-1)
-        while (new_index in indexes) or (new_index in exclude):
-            new_index = randint(0, game_size-1)
-        indexes.append(new_index)
-    return indexes
-
 def update_score(display, font_size, win_score, score_t1, score_t2):
     '''Display score needed to win and also each teams score.
 
@@ -247,14 +227,14 @@ if __name__ == '__main__':
 
     #Assign 2 words to death 'team' if game has more than 25 words.
     if rows*cols > 25:
-        deaths = get_indexes(2, rows*cols)
+        deaths = pw.get_unique_random_numbers(2, 0, rows*cols-1)
     else:
-        deaths = get_indexes(1, rows*cols)
+        deaths = pw.get_unique_random_numbers(1, 0, rows*cols-1)
 
     #Assign 40% of total words to each team
     score_to_win = int((2*rows*cols)/5)
-    team_1 = get_indexes(score_to_win, rows*cols, deaths)
-    team_2 = get_indexes(score_to_win, rows*cols, deaths + team_1)
+    team_1 = pw.get_unique_random_numbers(score_to_win, 0, rows*cols-1, deaths)
+    team_2 = pw.get_unique_random_numbers(score_to_win, 0, rows*cols-1, deaths + team_1)
 
     #Finish team assignments
     for i in deaths:
