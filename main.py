@@ -11,7 +11,7 @@ from universal_python_libraries import pygame_wrapper as gw
 from universal_python_libraries import colours
 
 #English words dictionary.
-DICTIONARY_FILE = 'dictionary.csv'
+DICTIONARY_FILE = 'common_words_dictionary.csv'
 SCORE = ['Score to win: ', 'Team 1: ', 'Team 2: ']
 GAME_BACKGROUND_COLOUR = colours.WHITE
 
@@ -126,10 +126,9 @@ def poll_for_exit():
     return
 
 def game_over(display):
-    game_over_text_surf, game_over_rect = gw.get_text_surf_and_pos('Game over! Death word was chosen.', colours.BLACK, font_size,
+    game_over_surf, game_over_rect = gw.get_text_surf_and_pos('Game over! Death word was chosen.', colours.BLACK, font_size,
                                                                 display.get_width()/2, display.get_height()/2)
     #TODO: FINISH THIS SECTION TO DRAW A POP-UP BOX PROVIDING THE USER TO SELECT AN 'OK' OPTION
-    game_over_box = game_over_surf.copy()
     display.blit(game_over_surf, game_over_rect)
     pygame.display.update()
     poll_for_exit()
