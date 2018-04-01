@@ -195,7 +195,7 @@ if __name__ == '__main__':
     if dict_count < 20:
         if dict_count == -1:
             error_msg = "Error: could not find the dictionary file!"
-        esurf, erect = gw.get_text_surf_and_pos(game_display, error_msg, colours.PRIMARY_RED, \
+        esurf, erect = gw.get_text_surf_and_pos(error_msg, colours.PRIMARY_RED, \
                                             35, window_w/2, window_h/2)
 
         #Overlay current message onto the game display surface and display it.
