@@ -12,7 +12,7 @@ from universal_python_libraries import colours
 
 #English words dictionary.
 DICTIONARY_FILE = 'common_words_dictionary.csv'
-SCORE = ['Score to win: ', 'Team 1: ', 'Team 2: ']
+SCORE = ['Score to win: ', 'Team green: ', 'Team blue: ']
 GAME_BACKGROUND_COLOUR = colours.WHITE
 
 class Cell(object):
@@ -28,7 +28,7 @@ class Cell(object):
     word -- game word of the cell
     team -- which team the word belongs too. 0 - netural, -1 - death word, 1 - team A, 2 - team B.
     team_col -- colour of the team that the word in the cell belongs to.
-    font_size = font size of the game word (default 24)
+    font_size = font size of the game word (default 30)
     cell_border -- border of the cell (default 0)
     '''
     def __init__(self, surf, left, top, width, height, init_col, word, team, team_col, font_size=30, cell_border=0):

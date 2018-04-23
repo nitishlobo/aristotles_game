@@ -3,11 +3,64 @@
     Imports:
     pygame
 
+    Key class:
+    Rectangle -- Draw a rectangle on an existing surface
+
     Key functions:
     get_text_surf_and_pos -- Return a surface object, its location, width and
                               height on which text/string can be displayed on.
 '''
 import pygame
+
+class Rectangle(object):
+    '''Draw a rectangle on an existing surface
+
+    Keyword arguments:
+    surf -- display the rectangle on top of this surface.
+    left -- pixel from the left of the screen for the left edge of the rectangular cell.
+    top -- pixel from the top of the screen for the top edge of the rectangular cell.
+    width -- width of the rectanglular cell
+    height -- height of the rectanglular cell
+    init_colour -- initial cell colour
+    text -- text to display inside this rectangle
+    font_size = font size of the game word (default 30)
+    cell_border -- border of the cell (default 0)
+    '''
+    def __init__(self, surf, left, top, width, height, init_col, text, font_size=30, cell_border=0):
+        self.surf = surf
+        self.left = left
+        self.top = top
+        self.width = width
+        self.height = height
+        self.init_col = init_col
+        self.text = text
+        self.font_size = font_size
+        self.cell_border = cell_border
+
+    def draw_rect(self):
+        '''Draw a shaded rectangle.'''
+        pygame.draw.rect(self.surf, self.init_col, \
+                        (self.left, self.top, self.width, self.height), self.cell_border)
+        return
+
+    def display_text(self):
+        '''Display the text.'''
+        #Get an invisible rectangular surface for the word and configure its location.
+        tsurf, trect = get_text_surf_and_pos(str(self.text), colours.WHITE, \
+                                            self.font_size, self.left + (self.width/2), \
+                                            self.top + (self.height/2), frame=(self.width, self.height))
+
+        #Overlay current word onto the game display surface and display it.
+        self.surf.blit(tsurf, trect)
+        pygame.display.update()
+        return
+
+    def reveal_team(self):
+        '''Colour the cell with the colour of the team that the word belongs to.'''
+        pygame.draw.rect(self.surf, self.team_col, \
+                        (self.left, self.top, self.width, self.height), self.cell_border)
+        self.display_word()
+        return
 
 def get_text_surf_and_pos(string, colour, font_size, x, y, align='center', font=None, frame=(0, 0)):
     '''Return a surface object, its location, width and
